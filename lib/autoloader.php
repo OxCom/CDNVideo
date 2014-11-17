@@ -30,3 +30,5 @@ class CDNVideoLoader
         \spl_autoload_register('CDNVideo\CDNVideoLoader::load');
     }
 }
+
+CDNVideoLoader::register();

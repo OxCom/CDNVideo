@@ -9,9 +9,6 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        require_once 'lib/autoloader.php';
-        \CDNVideo\CDNVideoLoader::register();
-
         $this->CDNVideo = new \CDNVideo\CDNVideo(array(
             'domain' => self::TEST_DOMAIN,
             'id'     => self::TEST_ID,
