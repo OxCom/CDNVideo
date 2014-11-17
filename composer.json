@@ -1,0 +1,10 @@
+{
+	"name": "OxCom/CDNVideo",
+	"description": "The CDNVideo core lib.",
+	"keywords": ["CDNVideo", "core"],
+	"license": "MIT",
+	"require": {
+		"phpunit/phpunit-selenium": "1.4.1"
+	},
+	"minimum-stability": "stable"
+}
