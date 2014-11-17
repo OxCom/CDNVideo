@@ -12,7 +12,6 @@ Just donwload lib and include it into your project :
 ```php
 
 require_once 'lib/autoloader.php';
-\CDNVideo\CDNVideoLoader::register();
 
 ```
 
