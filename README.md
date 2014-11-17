@@ -1,0 +1,4 @@
+CDNVideo
+========
+
+CDNVideo core lib
