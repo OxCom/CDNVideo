@@ -1,5 +1,6 @@
 {
-	"name": "OxCom/CDNVideo",
+	"name": "oxcom/cdnvideo",
+	"version" : "1.0.0",
 	"description": "The CDNVideo core lib.",
 	"keywords": ["CDNVideo", "core"],
 	"license": "MIT",
@@ -9,8 +10,8 @@
             "email": "lancer.oxcom@gmail.com"
         }
     ],
-    "require": {
-        "php": ">=5.3"
+    "require":{
+        "php":">=5.3.0"
     },
     "autoload": {
         "files": [
