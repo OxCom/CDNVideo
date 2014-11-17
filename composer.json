@@ -3,8 +3,18 @@
 	"description": "The CDNVideo core lib.",
 	"keywords": ["CDNVideo", "core"],
 	"license": "MIT",
-	"require": {
-		"phpunit/phpunit-selenium": "1.4.1"
-	},
-	"minimum-stability": "stable"
+    "authors": [
+        {
+            "name": "Andrey Afanasiev",
+            "email": "lancer.oxcom@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3"
+    },
+    "autoload": {
+        "files": [
+            "lib/autoloader.php"
+        ]
+    }
 }
