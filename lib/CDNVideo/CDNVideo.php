@@ -57,14 +57,18 @@ class CDNVideo
      * Clear cache all cache of cache for single file
      *
      * @param string|null $file
+     *
+     * @return bool|mixed
      */
     public function flush($file = null)
     {
         if (empty($file)) {
-            $this->_api->cacheFlushAll();
+            $result = $this->_api->cacheFlushAll();
         } else {
-            $this->_api->cacheFlushFile($file);
+            $result = $this->_api->cacheFlushFile($file);
         }
+
+        return $result;
     }
 
     /**

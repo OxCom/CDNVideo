@@ -111,64 +111,6 @@ class Parser
             return '';
         }
 
-        $details           = $this->_mb_parse_url($link);
-        $details['scheme'] = empty($details['scheme']) ? 'http' : $details['scheme'];
-        $details['host']   = $this->_settings->getCDNHost();
-
-        if (isset($details['path'])) {
-            $details['path'] = $details['path'][0] === '/' ? $details['path'] : ('/' . $details['path']);
-        }
-
-        return $this->_unparse_url($details);
-    }
-
-    /**
-     * UTF-8 aware parse_url() replacement.
-     *
-     * @return array
-     */
-    private function _mb_parse_url($url)
-    {
-        $enc_url = preg_replace_callback(
-            '%[^:/@?&=#]+%usD',
-            function ($matches) {
-                return urlencode($matches[0]);
-            },
-            $url
-        );
-
-        $parts = parse_url($enc_url);
-
-        if ($parts === false) {
-            throw new \InvalidArgumentException('Malformed URL: ' . $url);
-        }
-
-        foreach ($parts as $name => $value) {
-            $parts[$name] = urldecode($value);
-        }
-
-        return $parts;
-    }
-
-    /**
-     * Return back correct url
-     *
-     * @param $parsed_url
-     *
-     * @return string
-     */
-    private function _unparse_url($parsed_url)
-    {
-        $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
-        $host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
-        $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-        $user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
-        $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass'] : '';
-        $pass     = ($user || $pass) ? "$pass@" : '';
-        $path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
-        $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
-        $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
-
-        return "$scheme$user$pass$host$port$path$query$fragment";
+        return \CDNVideo\Tools\Utils::format_path($link,$this->_settings->getLocalScheme(), $this->_settings->getCDNHost());;
     }
 }

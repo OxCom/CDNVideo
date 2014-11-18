@@ -49,8 +49,32 @@ class Settings
         return $this->_targets;
     }
 
+    /**
+     * Return CDN host
+     *
+     * @return string
+     */
     public function getCDNHost()
     {
         return $this->_domain;
+    }
+
+    /**
+     * Return host of current server
+     * @return string
+     */
+    public function getLocalHost()
+    {
+        return $_SERVER['SERVER_NAME'];
+    }
+
+    /**
+     * Return scheme and host of current server
+     *
+     * @return string
+     */
+    public function getLocalScheme()
+    {
+        return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
     }
 }
