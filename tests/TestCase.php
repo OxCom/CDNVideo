@@ -62,6 +62,14 @@ class TestCase extends \PHPUnit_Framework_TestCase
                 'before' => '//some.domain.lo/files/duel.pdf',
                 'after'  => '//some.domain.lo/files/duel.pdf',
             ),
+            array(
+                'before' => '/bitrix/themes/.default/pubstyles.css?141681281149764',
+                'after'  => 'http://' . self::TEST_DOMAIN . '/bitrix/themes/.default/pubstyles.css?141681281149764',
+            ),
+            array(
+                'before' => '/bitrix/cache/css/s1/books/kernel_main/kernel_main.css?141777589650918',
+                'after'  => 'http://' . self::TEST_DOMAIN . '/bitrix/cache/css/s1/books/kernel_main/kernel_main.css?141777589650918',
+            ),
         );
 
         foreach ($links as $test) {

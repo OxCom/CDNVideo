@@ -101,9 +101,10 @@ class Parser
      */
     public function makeLink($link)
     {
-        $link = trim($link);
+        $link      = trim($link);
+        $linkClear = preg_replace('/(.*)\?(.*)/', '$1', $link);
 
-        if (!in_array(pathinfo($link, PATHINFO_EXTENSION), $this->_targets)) {
+        if (!in_array(pathinfo($linkClear, PATHINFO_EXTENSION), $this->_targets)) {
             return $link;
         }
 
