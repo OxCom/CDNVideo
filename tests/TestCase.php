@@ -143,6 +143,30 @@ class TestCase extends \PHPUnit_Framework_TestCase
                     <link href="http://' . self::TEST_DOMAIN . '/bitrix/themes/.default/pubstyles.css?141681281149764" type="text/css"  data-template-style="true"  rel="stylesheet" />
                 ',
             ),
+            array(
+                'before' => '
+                    asdlkfj <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css">adsf</a> 34523 <a href="http://yandex.com/dasf/asd.js">adsf</a>
+                ',
+                'after' => '
+                    asdlkfj <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css">adsf</a> 34523 <a href="http://' . self::TEST_DOMAIN . '/dasf/asd.js">adsf</a>
+                ',
+            ),
+            /*array(
+                'before' => '
+                     <div style="background-image: url(/upload/iblock/157/complex.gif)"></div>
+                ',
+                'after' => '
+                    <div style="background-image: url(http://' . self::TEST_DOMAIN . '/upload/iblock/157/complex.gif)"></div>
+                ',
+            ),
+            array(
+                'before' => '
+                    <script>BX.loadScript("/bitrix/components/bitrix/player/mediaplayer/jwplayer.js", function(){setTimeout(function()</script>
+                ',
+                'after' => '
+                    <script>BX.loadScript("http://' . self::TEST_DOMAIN . '/bitrix/components/bitrix/player/mediaplayer/jwplayer.js", function(){setTimeout(function()</script>
+                ',
+            ),*/
         );
 
         foreach ($links as $test) {
