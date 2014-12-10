@@ -81,7 +81,8 @@ class Parser
     protected function parseTargets()
     {
         $targets = implode('|', $this->_targets);
-        preg_match_all('/="([^"]*\.(' . $targets . '))/i', $this->html, $result);
+        $regexp = '/((?<=[^style]=["|\'])([^"|\']*\.(' . $targets . '))|(?<=url[\("|\(\'|\(])([^"\)|\'\)|\)]*(css|gif|js)))/i';
+        preg_match_all($regexp, $this->html, $result);
 
         // all links should be in second group
         $links = empty($result[1]) ? array() : $result[1];

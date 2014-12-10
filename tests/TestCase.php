@@ -151,14 +151,29 @@ class TestCase extends \PHPUnit_Framework_TestCase
                     asdlkfj <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css">adsf</a> 34523 <a href="http://' . self::TEST_DOMAIN . '/dasf/asd.js">adsf</a>
                 ',
             ),
-            /*array(
+            array(
                 'before' => '
-                     <div style="background-image: url(/upload/iblock/157/complex.gif)"></div>
+                    <div style="background-image: url(/upload/iblock/157/complex.gif)"></div>
                 ',
                 'after' => '
                     <div style="background-image: url(http://' . self::TEST_DOMAIN . '/upload/iblock/157/complex.gif)"></div>
                 ',
             ),
+            array(
+                'before' => '
+                    complex <a href="http://example.com/sdah/styles.css">complex</a> complex <a href="http://yandex.com/dasf/asd.js">complex</a> 
+                    <a href=\'http://example.com/sdah/styles.css\'>complex</a> complex <a href=\'http://example.com/sdah/styles.css?complex\'>complex</a> 34523
+                    <link href="/bitrix/cache/css/s1/books/kernel_main/kernel_main.css?141777589650918" type="text/css"  rel="stylesheet" />
+                    <div style="background-image: url(http://google.com/upload/iblock/157/complex.gif)"></div>
+                ',
+                'after' => '
+                    complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css">complex</a> complex <a href="http://' . self::TEST_DOMAIN . '/dasf/asd.js">complex</a> 
+                    <a href=\'http://' . self::TEST_DOMAIN . '/sdah/styles.css\'>complex</a> complex <a href=\'http://' . self::TEST_DOMAIN . '/sdah/styles.css?complex\'>complex</a> 34523
+                    <link href="http://' . self::TEST_DOMAIN . '/bitrix/cache/css/s1/books/kernel_main/kernel_main.css?141777589650918" type="text/css"  rel="stylesheet" />
+                    <div style="background-image: url(http://' . self::TEST_DOMAIN . '/upload/iblock/157/complex.gif)"></div>
+                ',
+            ),
+            /*
             array(
                 'before' => '
                     <script>BX.loadScript("/bitrix/components/bitrix/player/mediaplayer/jwplayer.js", function(){setTimeout(function()</script>
