@@ -71,6 +71,15 @@ class CDNVideo
         return $result;
     }
 
+    public function getCacheTime()
+    {
+        if (\CDNVideo\Tools\Utils::update_cache_required($this->_settings->getCacheInitTime(), $this->_settings->getCacheTTL())) {
+            return $this->_settings->getNextInitTime();
+        }
+
+        return $this->_settings->getCacheInitTime();
+    }
+
     /**
      * @TODO: search details about element in cache
      */

@@ -114,11 +114,16 @@ class Parser
             return '';
         }
 
-        if (\CDNVideo\Tools\Utils::update_cache_required($link, $this->_settings->getCacheInitTime(), $this->_settings->getCacheTTL())) {
-            $link = \CDNVideo\Tools\Utils::update_link_cache($link);
+        if (\CDNVideo\Tools\Utils::update_cache_required($this->_settings->getCacheInitTime(), $this->_settings->getCacheTTL())) {
+            $link = \CDNVideo\Tools\Utils::update_link_cache($link, $this->_settings->getNextInitTime());
         }
 
         $link = \CDNVideo\Tools\Utils::format_path($link, $this->_settings);
         return $link;
+    }
+
+    public function getNextInitTime()
+    {
+        return $this->_settings->getNextInitTime();
     }
 }

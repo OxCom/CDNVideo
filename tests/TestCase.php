@@ -196,4 +196,39 @@ class TestCase extends \PHPUnit_Framework_TestCase
             $this->assertEquals($test['after'], $link);
         }
     }
+
+    public function testCache()
+    {
+        $time     = time();
+        $ttl      = 1;
+        $CDNVideo = new \CDNVideo\CDNVideo(array(
+            'domain'    => self::TEST_DOMAIN,
+            'id'        => self::TEST_ID,
+            'init_time' => $time,
+            'ttl'       => $ttl,
+        ));
+
+        $links = array(
+            array(
+                'before' => '<a href="test.js">test</a>',
+                'after' => '<a href="http://' . self::TEST_DOMAIN . '/test.js?_cvc=' . $time .'">test</a>',
+            ),
+            array(
+                'before' => '<a href="test.js?qwe=123">test</a>',
+                'after' => '<a href="http://' . self::TEST_DOMAIN . '/test.js?qwe=123&_cvc=' . $time .'">test</a>',
+            ),
+        );
+
+        foreach ($links as $test) {
+            $link = $CDNVideo->process($test['before']);
+            $this->assertEquals($test['after'], $link);
+        }
+
+        sleep($ttl * 5);
+
+        $link     = $CDNVideo->process('<a href="test.js">test</a>');
+        $nextTime = $CDNVideo->getCacheTime();
+        $this->assertNotEquals('<a href="http://' . self::TEST_DOMAIN . '/test.js?_cvc=' . $time . '">test</a>', $link);
+        $this->assertEquals('<a href="http://' . self::TEST_DOMAIN . '/test.js?_cvc=' . $nextTime . '">test</a>', $link);
+    }
 }

@@ -39,6 +39,8 @@ class Settings
      */
     private $_cacheInitTime = 0;
 
+    protected $_cacheNextTime = 0;
+
     public function __construct(array $settings)
     {
         $this->_domain        = \CDNVideo\Tools\Utils::val($settings, 'domain', '');
@@ -46,6 +48,7 @@ class Settings
         $this->_id            = \CDNVideo\Tools\Utils::val($settings, 'id', '');
         $this->_cacheTTL      = \CDNVideo\Tools\Utils::val($settings, 'ttl', 1209600);
         $this->_cacheInitTime = \CDNVideo\Tools\Utils::val($settings, 'init_time', time());
+        $this->_cacheNextTime = $this->_cacheInitTime + $this->_cacheTTL + rand(10, 50);
     }
 
     public function getId()
@@ -110,5 +113,10 @@ class Settings
     public function getLocalScheme()
     {
         return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
+    }
+
+    public function getNextInitTime()
+    {
+        return $this->_cacheNextTime;
     }
 }

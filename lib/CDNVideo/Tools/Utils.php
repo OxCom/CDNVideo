@@ -111,14 +111,14 @@ class Utils {
      * Validate cache time
      *
      * @param $link
-     * @param $time
+     * @param $initTime
      * @param $ttl
      *
      * @return bool
      */
-    static public function update_cache_required($link, $time, $ttl)
+    static public function update_cache_required($initTime, $ttl)
     {
-        return time() > ($time + $ttl);
+        return time() > ($initTime + $ttl);
     }
 
     /**
