@@ -11,12 +11,12 @@ class CDNVideoLoader
 
         if (is_file($target)) {
             include_once $target;
-        } else {
+        } elseif (preg_match('/'.__NAMESPACE__.'/', $target)) {
             // hack (CentOS + Bitrix => namespace name in $file = \CDNVideo\Settings instead of \CDNVideo\Tools\Settings)
             // @TODO: remove this!!!
             $file = explode(DIRECTORY_SEPARATOR, $file);
             $file = implode(DIRECTORY_SEPARATOR, array($file[0], 'Tools', $file[1]));
-            
+
             if (is_file($target)) {
                 include_once $target;
             }

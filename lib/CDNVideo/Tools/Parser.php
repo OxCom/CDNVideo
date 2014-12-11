@@ -81,15 +81,16 @@ class Parser
     protected function parseTargets()
     {
         $targets = implode('|', $this->_targets);
-        $regexp = '/((?<=[^style]=["|\'])([^"|\']*\.(' . $targets . '))|(?<=url[\("|\(\'|\(])([^"\)|\'\)|\)]*(css|gif|js)))/i';
+        $regexp = '/((?<=[^style]=["|\'])([^"|\']*\.(' . $targets . ')[^"|\']*)|(?<=url[\("|\(\'|\(])([^"\)|\'\)|\)]*(' . $targets . ')[^"|\'|\)]*))/i';
         preg_match_all($regexp, $this->html, $result);
 
         // all links should be in second group
         $links = empty($result[1]) ? array() : $result[1];
 
         foreach ($links as $link) {
-            $newLink = $this->makeLink($link);
-            $this->html = str_replace($link, $newLink, $this->html);
+            $newLink    = $this->makeLink($link);
+            $link       = preg_quote($link, '/');
+            $this->html = preg_replace("/($link)/i", $newLink, $this->html, 1);
         }
     }
 
@@ -113,6 +114,11 @@ class Parser
             return '';
         }
 
-        return \CDNVideo\Tools\Utils::format_path($link,$this->_settings->getLocalScheme(), $this->_settings->getCDNHost());;
+        if (\CDNVideo\Tools\Utils::update_cache_required($link, $this->_settings->getCacheInitTime(), $this->_settings->getCacheTTL())) {
+            $link = \CDNVideo\Tools\Utils::update_link_cache($link);
+        }
+
+        $link = \CDNVideo\Tools\Utils::format_path($link, $this->_settings);
+        return $link;
     }
 }

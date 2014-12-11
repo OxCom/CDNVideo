@@ -40,14 +40,15 @@ class Utils {
     static public function unparse_url($parsed_url)
     {
         $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
-        $host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
-        $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-        $user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
-        $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass'] : '';
+        $host     = \CDNVideo\Tools\Utils::val($parsed_url, 'host', '');
+        $port     = \CDNVideo\Tools\Utils::val($parsed_url, 'port', '');
+        $user     = \CDNVideo\Tools\Utils::val($parsed_url, 'user', '');
+        $pass     = \CDNVideo\Tools\Utils::val($parsed_url, 'pass', '');
         $pass     = ($user || $pass) ? "$pass@" : '';
-        $path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
-        $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
-        $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+        $path     = \CDNVideo\Tools\Utils::val($parsed_url, 'path', '');
+        $query    = \CDNVideo\Tools\Utils::val($parsed_url, 'query', '');
+        $fragment = \CDNVideo\Tools\Utils::val($parsed_url, 'fragment', '');
+        $query    = empty($query) ? '' : ('?' . $query);
 
         return "$scheme$user$pass$host$port$path$query$fragment";
     }
@@ -61,16 +62,85 @@ class Utils {
      *
      * @return string
      */
-    static public function format_path($path, $scheme, $host)
+    static public function format_path($path, \CDNVideo\Tools\Settings $settings)
     {
         $details = \CDNVideo\Tools\Utils::mb_parse_url($path);
-        $details['scheme'] = empty($details['scheme']) ? $scheme : $details['scheme'];
-        $details['host']   = $host;
+        $details['scheme'] = empty($details['scheme']) ? $settings->getLocalScheme() : $details['scheme'];
+        $details['host']   = $settings->getCDNHost();
+
 
         if (isset($details['path'])) {
             $details['path'] = $details['path'][0] === '/' ? $details['path'] : ('/' . $details['path']);
         }
 
+        $query = \CDNVideo\Tools\Utils::val($details, 'query', '');
+        if (!preg_match('/_cvc=/', $query)) {
+            $query .= empty($query) ? '' : '&';
+            $query .= '_cvc=' . $settings->getCacheInitTime();
+
+            $details['query'] = $query;
+        }
+
         return \CDNVideo\Tools\Utils::unparse_url($details);
+    }
+
+    /**
+     * Return array key/object property from target or default value
+     *
+     * @param array|object $target
+     * @param string       $key
+     * @param string       $default
+     *
+     * @return string
+     */
+    static public function val($target, $key, $default = '')
+    {
+        if (is_array($target)) {
+            $value = array_key_exists($key, $target) ? $target[$key] : $default;
+        } elseif (is_object($target)) {
+            $value = property_exists($target, $key) ? $target->{$key} : $default;
+        } else {
+            $value = $default;
+        }
+
+        return $value;
+    }
+
+
+    /**
+     * Validate cache time
+     *
+     * @param $link
+     * @param $time
+     * @param $ttl
+     *
+     * @return bool
+     */
+    static public function update_cache_required($link, $time, $ttl)
+    {
+        return time() > ($time + $ttl);
+    }
+
+    /**
+     * Add cache param for URL as part of query string
+     *
+     * @param      $link
+     * @param null $time
+     *
+     * @return string
+     */
+    static public function update_link_cache($link, $time = null)
+    {
+        $time    = empty($time) ? time() : $time;
+        $details = \CDNVideo\Tools\Utils::mb_parse_url($link);
+        $query   = \CDNVideo\Tools\Utils::val($details, 'query', '');
+
+        $query .= empty($query) ? '' : '&';
+        $query .= '_cvc=' . $time;
+
+        $details['query'] = $query;
+        $link             = \CDNVideo\Tools\Utils::unparse_url($details);
+
+        return $link;
     }
 }

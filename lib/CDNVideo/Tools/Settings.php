@@ -27,11 +27,25 @@ class Settings
      */
     private $_id = '';
 
+    /**
+     * Cache time period: 14 * 24 * 60 * 60 = 1209600
+     * @var int
+     */
+    private $_cacheTTL = 1209600;
+
+    /**
+     * Time when cache was initialized
+     * @var int
+     */
+    private $_cacheInitTime = 0;
+
     public function __construct(array $settings)
     {
-        $this->_domain  = empty($settings['domain']) ? '' : $settings['domain'];
-        $this->_targets = empty($settings['targets']) ? $this->_targets : $settings['targets'];
-        $this->_id      = empty($settings['id']) ? '' : $settings['id'];
+        $this->_domain        = \CDNVideo\Tools\Utils::val($settings, 'domain', '');
+        $this->_targets       = \CDNVideo\Tools\Utils::val($settings, 'targets', $this->_targets);
+        $this->_id            = \CDNVideo\Tools\Utils::val($settings, 'id', '');
+        $this->_cacheTTL      = \CDNVideo\Tools\Utils::val($settings, 'ttl', 1209600);
+        $this->_cacheInitTime = \CDNVideo\Tools\Utils::val($settings, 'init_time', time());
     }
 
     public function getId()
@@ -66,6 +80,26 @@ class Settings
     public function getLocalHost()
     {
         return $_SERVER['SERVER_NAME'];
+    }
+
+    /**
+     * Return cache TTL time
+     *
+     * @return int
+     */
+    public function getCacheTTL()
+    {
+        return (int)$this->_cacheTTL;
+    }
+
+    /**
+     * Get time when cache was initialized
+     *
+     * @return int
+     */
+    public function getCacheInitTime()
+    {
+        return (int)$this->_cacheInitTime;
     }
 
     /**
