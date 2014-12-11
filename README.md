@@ -22,8 +22,11 @@ Your should define some settings for lib. They should be in your contract with C
 ```php
 
 $CDNVideo = new \CDNVideo\CDNVideo(array(
-    'domain' => 'example.com',
-    'id'     => 1000,
+    'domain'  => 'example.com',
+    'id'      => 1000,
+    'targets' => array(
+        'css', 'js', 'jpeg', 'jpg', 'png', 'gif', 'mp3', 'mp4', 'ogg', 'flv'
+    ),
 ));
 
 ```
