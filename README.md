@@ -27,7 +27,7 @@ $CDNVideo = new \CDNVideo\CDNVideo(array(
     'targets' => array(
         'css', 'js', 'jpeg', 'jpg', 'png', 'gif', 'mp3', 'mp4', 'ogg', 'flv'
     ),
-    'init_time' => $this->initTime, // default: time()
+    'init_time' => time(), // default: time()
     'ttl'       => self::TEST_TTL, // default: 14 days
 ));
 
