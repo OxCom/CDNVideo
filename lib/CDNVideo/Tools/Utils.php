@@ -66,8 +66,18 @@ class Utils {
     {
         $details = \CDNVideo\Tools\Utils::mb_parse_url($path);
         $details['scheme'] = empty($details['scheme']) ? $settings->getLocalScheme() : $details['scheme'];
-        $details['host']   = $settings->getCDNHost();
 
+        if (!$settings->getParseAll()) {
+            // set CDN only for app
+            $localHost = $settings->getLocalHost();
+
+            if ($settings->getCDNHost() == $localHost || !empty($details['host']) && !preg_match("/$localHost/", $details['host'])) {
+                return \CDNVideo\Tools\Utils::unparse_url($details);
+            }
+        }
+        
+
+        $details['host'] = $settings->getCDNHost();
 
         if (isset($details['path'])) {
             $details['path'] = $details['path'][0] === '/' ? $details['path'] : ('/' . $details['path']);

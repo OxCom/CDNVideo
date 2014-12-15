@@ -4,6 +4,17 @@ namespace CDNVideo\Tools;
 
 class Settings
 {
+
+    /**
+    *
+    */
+    private $_parseAll = false;
+
+    /**
+    *
+    */
+    private $_serverName = '';
+
     /**
      * Domain name at CDNVideo
      *
@@ -49,11 +60,18 @@ class Settings
         $this->_cacheTTL      = \CDNVideo\Tools\Utils::val($settings, 'ttl', 1209600);
         $this->_cacheInitTime = \CDNVideo\Tools\Utils::val($settings, 'init_time', time());
         $this->_cacheNextTime = time() + rand(10, 50);
+        $this->_parseAll      = \CDNVideo\Tools\Utils::val($settings, 'parse_all', false);
+        $this->_serverName    = \CDNVideo\Tools\Utils::val($settings, 'server_name', null);
     }
 
     public function getId()
     {
         return $this->_id;
+    }
+
+    public function getParseAll()
+    {
+        return (bool)$this->_parseAll;
     }
 
     /**
@@ -82,7 +100,7 @@ class Settings
      */
     public function getLocalHost()
     {
-        return $_SERVER['SERVER_NAME'];
+        return empty($this->_serverName) ? $_SERVER['SERVER_NAME'] : $this->_serverName;
     }
 
     /**

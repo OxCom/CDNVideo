@@ -2,9 +2,10 @@
 
 class TestCase extends \PHPUnit_Framework_TestCase
 {
-    const TEST_DOMAIN = 'debug.lo';
-    const TEST_ID = '1000';
-    const TEST_TTL = 3600;
+    const TEST_DOMAIN      = 'debug.lo';
+    const TEST_SERVER_NAME = 'example.com';
+    const TEST_ID          = '1000';
+    const TEST_TTL         = 3600;
 
     protected $CDNVideo;
     protected $initTime;
@@ -17,6 +18,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
             'id'        => self::TEST_ID,
             'init_time' => $this->initTime,
             'ttl'       => self::TEST_TTL,
+            'parse_all' => true,
         ));
     }
 
@@ -180,15 +182,6 @@ class TestCase extends \PHPUnit_Framework_TestCase
                     <div style="background-image: url(http://' . self::TEST_DOMAIN . '/upload/iblock/157/complex.gif?asd=qwe&_cvc=' . $this->initTime .')"></div>
                 ',
             ),
-            /*
-            array(
-                'before' => '
-                    <script>BX.loadScript("/bitrix/components/bitrix/player/mediaplayer/jwplayer.js", function(){setTimeout(function()</script>
-                ',
-                'after' => '
-                    <script>BX.loadScript("http://' . self::TEST_DOMAIN . '/bitrix/components/bitrix/player/mediaplayer/jwplayer.js", function(){setTimeout(function()</script>
-                ',
-            ),*/
         );
 
         foreach ($links as $test) {
@@ -206,6 +199,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
             'id'        => self::TEST_ID,
             'init_time' => $time,
             'ttl'       => $ttl,
+            'parse_all' => true,
         ));
 
         $links = array(
@@ -230,5 +224,48 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $nextTime = $CDNVideo->getCacheTime();
         $this->assertNotEquals('<a href="http://' . self::TEST_DOMAIN . '/test.js?_cvc=' . $time . '">test</a>', $link);
         $this->assertEquals('<a href="http://' . self::TEST_DOMAIN . '/test.js?_cvc=' . $nextTime . '">test</a>', $link);
+    }
+
+    public function testDomainParse()
+    {        
+        $CDNVideo = new \CDNVideo\CDNVideo(array(
+            'domain'      => self::TEST_DOMAIN,
+            'id'          => self::TEST_ID,
+            'init_time'   => $this->initTime,
+            'ttl'         => self::TEST_TTL,            
+            'server_name' => self::TEST_SERVER_NAME,
+        ));
+        
+        $links = array(
+            array(
+                'before' => '<a href="test.js">test</a>',
+                'after'  => '<a href="http://' . self::TEST_DOMAIN . '/test.js?_cvc=' . $this->initTime .'">test</a>',
+            ),
+            array(
+                'before' => '<a href="/test1.js">test</a>',
+                'after'  => '<a href="http://' . self::TEST_DOMAIN . '/test1.js?_cvc=' . $this->initTime .'">test</a>',
+            ),
+            array(
+                'before' => '<a href="http://' . self::TEST_SERVER_NAME . '/test.js">test</a>',
+                'after'  => '<a href="http://' . self::TEST_DOMAIN . '/test.js?_cvc=' . $this->initTime .'">test</a>',
+            ),
+            array(
+                'before' => '<a href="http://' . self::TEST_DOMAIN . '/test.js">test</a>',
+                'after'  => '<a href="http://' . self::TEST_DOMAIN . '/test.js">test</a>',
+            ),
+            array(
+                'before' => '<a href="http://google.com/test1.js">test</a>',
+                'after'  => '<a href="http://google.com/test1.js">test</a>',
+            ),
+            array(
+                'before' => '<a href="//google.com/test1.js">test</a>',
+                'after'  => '<a href="http://google.com/test1.js">test</a>',
+            ),            
+        );
+
+        foreach ($links as $test) {
+            $link = $CDNVideo->process($test['before']);
+            $this->assertEquals($test['after'], $link);
+        }
     }
 }
