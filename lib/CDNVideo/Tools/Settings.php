@@ -48,7 +48,7 @@ class Settings
         $this->_id            = \CDNVideo\Tools\Utils::val($settings, 'id', '');
         $this->_cacheTTL      = \CDNVideo\Tools\Utils::val($settings, 'ttl', 1209600);
         $this->_cacheInitTime = \CDNVideo\Tools\Utils::val($settings, 'init_time', time());
-        $this->_cacheNextTime = $this->_cacheInitTime + $this->_cacheTTL + rand(10, 50);
+        $this->_cacheNextTime = time() + rand(10, 50);
     }
 
     public function getId()
