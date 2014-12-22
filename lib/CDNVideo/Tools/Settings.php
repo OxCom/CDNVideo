@@ -10,9 +10,6 @@ class Settings
     */
     private $_parseAll = false;
 
-    /**
-    *
-    */
     private $_serverName = '';
 
     /**
@@ -54,7 +51,7 @@ class Settings
 
     public function __construct(array $settings)
     {
-        $this->_domain        = \CDNVideo\Tools\Utils::val($settings, 'domain', '');
+        $this->_domain        = \CDNVideo\Tools\Utils::val($settings, 'domain', array());
         $this->_targets       = \CDNVideo\Tools\Utils::val($settings, 'targets', $this->_targets);
         $this->_id            = \CDNVideo\Tools\Utils::val($settings, 'id', '');
         $this->_cacheTTL      = \CDNVideo\Tools\Utils::val($settings, 'ttl', 1209600);
@@ -62,6 +59,10 @@ class Settings
         $this->_cacheNextTime = time() + rand(10, 50);
         $this->_parseAll      = \CDNVideo\Tools\Utils::val($settings, 'parse_all', false);
         $this->_serverName    = \CDNVideo\Tools\Utils::val($settings, 'server_name', null);
+
+        if (!is_array($this->_domain)) {
+            $this->_domain = array($this->_domain);
+        }
     }
 
     public function getId()
@@ -85,13 +86,16 @@ class Settings
     }
 
     /**
-     * Return CDN host
+     * Return (random) CDN host
      *
      * @return string
      */
     public function getCDNHost()
     {
-        return $this->_domain;
+        $domain = $this->_domain;
+        shuffle($domain);
+
+        return array_shift($domain);
     }
 
     /**

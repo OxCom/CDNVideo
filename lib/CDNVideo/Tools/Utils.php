@@ -75,7 +75,6 @@ class Utils {
                 return \CDNVideo\Tools\Utils::unparse_url($details);
             }
         }
-        
 
         $details['host'] = $settings->getCDNHost();
 

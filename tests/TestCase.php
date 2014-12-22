@@ -227,15 +227,15 @@ class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     public function testDomainParse()
-    {        
+    {
         $CDNVideo = new \CDNVideo\CDNVideo(array(
             'domain'      => self::TEST_DOMAIN,
             'id'          => self::TEST_ID,
             'init_time'   => $this->initTime,
-            'ttl'         => self::TEST_TTL,            
+            'ttl'         => self::TEST_TTL,
             'server_name' => self::TEST_SERVER_NAME,
         ));
-        
+
         $links = array(
             array(
                 'before' => '<a href="test.js">test</a>',
@@ -260,7 +260,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
             array(
                 'before' => '<a href="//google.com/test1.js">test</a>',
                 'after'  => '<a href="http://google.com/test1.js">test</a>',
-            ),            
+            ),
         );
 
         foreach ($links as $test) {
@@ -268,4 +268,100 @@ class TestCase extends \PHPUnit_Framework_TestCase
             $this->assertEquals($test['after'], $link);
         }
     }
+
+    public function testMultiDomain()
+    {
+        $domain1  = 'test1.com';
+        $domain2  = 'test2.com';
+        $domain3  = 'test3.com';
+        $CDNVideo = new \CDNVideo\CDNVideo(array(
+            'domain'      => array($domain1, $domain2, $domain3),
+            'id'          => self::TEST_ID,
+            'init_time'   => $this->initTime,
+            'ttl'         => self::TEST_TTL,
+            'server_name' => self::TEST_SERVER_NAME,
+        ));
+
+        $links = array(
+            '<a href="test.js">test</a>',
+            '<a href="/test1.js">test</a>',
+            '<a href="http://' . self::TEST_SERVER_NAME . '/test1.js">test</a>',
+        );
+
+        foreach ($links as $test) {
+            $result = $CDNVideo->process($test);
+            $this->assertTrue(!!preg_match("/($domain1)|($domain2)|($domain3)/", $result));
+        }
+    }
+
+    public function testChain()
+    {
+        $domain1       = 'test1.com';
+        $domain2       = 'test2.com';
+        $domain1Targets = array(
+            'css', 'js', 'jpeg', 'jpg', 'png', 'gif'
+        );
+        $domain2Targets = array(
+            'mp3', 'mp4', 'ogg', 'flv'
+        );
+
+
+        $chainElement1 = array(
+            'domain'      => $domain1,
+            'id'          => self::TEST_ID,
+            'init_time'   => $this->initTime,
+            'ttl'         => self::TEST_TTL,
+            'server_name' => self::TEST_SERVER_NAME,
+            'targets'     => $domain1Targets,
+        );
+        $chainElement2 = array(
+            'domain'      => $domain2,
+            'id'          => self::TEST_ID,
+            'init_time'   => $this->initTime,
+            'ttl'         => self::TEST_TTL,
+            'server_name' => self::TEST_SERVER_NAME,
+            'targets'     => $domain2Targets,
+        );
+
+        $CDNVideoChain = new \CDNVideo\CDNChain();
+        $CDNVideoChain
+            ->addChainElement($chainElement1)
+            ->addChainElement($chainElement2);
+
+        $links = array(
+            'js'   => '<a href="/test.js">test</a>',
+            'css'  => '<a href="/test.css">test</a>',
+            'jpeg' => '<a href="/test.jpeg">test</a>',
+            'png'  => '<a href="/test.png">test</a>',
+            'mp3'  => '<a href="/test.mp3">test</a>',
+            'mp4'  => '<a href="/test.mp4">test</a>',
+            'ogg'  => '<a href="/test.ogg">test</a>',
+        );
+
+        foreach ($links as $key => $test) {
+            $result = $CDNVideoChain->process($test);
+            if (in_array($key, $domain1Targets)) {
+                $this->assertTrue(!!preg_match("/($domain1)/", $result));
+            } else if (in_array($key, $domain2Targets)) {
+                $this->assertTrue(!!preg_match("/($domain2)/", $result));
+            } else {
+                $this->assertTrue(false);
+            }
+        }
+    }
+
+//    public function testMultiReplace()
+//    {
+//        $htmlBefore = '
+//            complex <a href="/sdah/styles.css">complex</a> complex <a href="/sdah/styles.css">complex</a>
+//            complex <a href="/sdah/styles.css">complex</a>
+//        ';
+//        $htmlAfter = '
+//            complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a> complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a>
+//            complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a>
+//        ';
+//
+//        $link = $this->CDNVideo->process($htmlBefore);
+//        $this->assertEquals($htmlAfter, $link);
+//    }
 }
