@@ -305,7 +305,6 @@ class TestCase extends \PHPUnit_Framework_TestCase
             'mp3', 'mp4', 'ogg', 'flv'
         );
 
-
         $chainElement1 = array(
             'domain'      => $domain1,
             'id'          => self::TEST_ID,
@@ -348,6 +347,26 @@ class TestCase extends \PHPUnit_Framework_TestCase
                 $this->assertTrue(false);
             }
         }
+
+        /**
+         * Test cache time functions
+         */
+        $chainCacheTime = $CDNVideoChain->getCacheTime();
+        $this->assertEquals(2, count($chainCacheTime));
+
+        $chainElement1['chainKey'] = 'kay_1';
+        $chainElement2['chainKey'] = 'kay_2';
+
+        $CDNVideoChain = new \CDNVideo\CDNChain();
+        $CDNVideoChain
+            ->addChainElement($chainElement1)
+            ->addChainElement($chainElement2);
+
+        $time = $CDNVideoChain->getCacheTime($chainElement1['chainKey']);
+        $this->assertEquals($this->initTime, $time);
+
+        $time = $CDNVideoChain->getCacheTime($chainElement2['chainKey']);
+        $this->assertEquals($this->initTime, $time);
     }
 
 //    public function testMultiReplace()
