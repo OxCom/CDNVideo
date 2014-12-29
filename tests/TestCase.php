@@ -182,6 +182,30 @@ class TestCase extends \PHPUnit_Framework_TestCase
                     <div style="background-image: url(http://' . self::TEST_DOMAIN . '/upload/iblock/157/complex.gif?asd=qwe&_cvc=' . $this->initTime .')"></div>
                 ',
             ),
+            array(
+                'before' => '
+                    <div style="background-image: url(http://google.com/upload/iblock/157/complex.gif)"></div>
+                ',
+                'after' => '
+                    <div style="background-image: url(http://' . self::TEST_DOMAIN . '/upload/iblock/157/complex.gif?_cvc=' . $this->initTime .')"></div>
+                ',
+            ),
+            array(
+                'before' => '
+                    <div style="background-image: url(\'http://google.com/upload/iblock/157/complex.gif\')"></div>
+                ',
+                'after' => '
+                    <div style="background-image: url(\'http://' . self::TEST_DOMAIN . '/upload/iblock/157/complex.gif?_cvc=' . $this->initTime .'\')"></div>
+                ',
+            ),
+            array(
+                'before' => '
+                    <div style="background-image: url("http://google.com/upload/iblock/157/complex.gif?asd=qwe")"></div>
+                ',
+                'after' => '
+                    <div style="background-image: url("http://' . self::TEST_DOMAIN . '/upload/iblock/157/complex.gif?asd=qwe&_cvc=' . $this->initTime .'")"></div>
+                ',
+            ),
         );
 
         foreach ($links as $test) {
@@ -369,18 +393,45 @@ class TestCase extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->initTime, $time);
     }
 
-//    public function testMultiReplace()
-//    {
-//        $htmlBefore = '
-//            complex <a href="/sdah/styles.css">complex</a> complex <a href="/sdah/styles.css">complex</a>
-//            complex <a href="/sdah/styles.css">complex</a>
-//        ';
-//        $htmlAfter = '
-//            complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a> complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a>
-//            complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a>
-//        ';
-//
-//        $link = $this->CDNVideo->process($htmlBefore);
-//        $this->assertEquals($htmlAfter, $link);
-//    }
+    public function testMultiReplace()
+    {
+        $htmlBefore = '
+            complex <a href="/sdah/styles.css">complex</a>
+            complex <a href="/sdah/styles.css">complex</a>
+            complex <a href="/sdah/styles.css">complex</a>
+        ';
+        $htmlAfter = '
+            complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a>
+            complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a>
+            complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a>
+        ';
+
+        $link = $this->CDNVideo->process($htmlBefore);
+        $this->assertEquals($htmlAfter, $link);
+
+        // add background
+        $htmlBefore = '
+            complex <a href="/sdah/styles.css">complex</a>
+            complex <a href="/sdah/styles.css?qwe=as">complex</a>
+            complex <a href="/sdah/styles.css">complex</a>
+
+            <div style="background-image: url(/sdah/styles.css)"></div>
+            <div style="background-image: url(/sdah/styles.css?qwe=asd)"></div>
+            <div style="background-image: url(\'/sdah/styles.css\')"></div>
+            <div style=\'background-image: url("/sdah/styles.css")\'></div>
+        ';
+        $htmlAfter = '
+            complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a>
+            complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?qwe=as&_cvc=' . $this->initTime .'">complex</a>
+            complex <a href="http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'">complex</a>
+
+            <div style="background-image: url(http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .')"></div>
+            <div style="background-image: url(http://' . self::TEST_DOMAIN . '/sdah/styles.css?qwe=asd&_cvc=' . $this->initTime .')"></div>
+            <div style="background-image: url(\'http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'\')"></div>
+            <div style=\'background-image: url("http://' . self::TEST_DOMAIN . '/sdah/styles.css?_cvc=' . $this->initTime .'")\'></div>
+        ';
+
+        $link = $this->CDNVideo->process($htmlBefore);
+        $this->assertEquals($htmlAfter, $link);
+    }
 }

@@ -81,16 +81,22 @@ class Parser
     protected function parseTargets()
     {
         $targets = implode('|', $this->_targets);
-        $regexp = '/((?<=[^style]=["|\'])([^"|\']*\.(' . $targets . ')[^"|\']*)|(?<=url[\("|\(\'|\(])([^"\)|\'\)|\)]*(' . $targets . ')[^"|\'|\)]*))/i';
+        $regexp = '/((?<=[^style]=["|\'])([^"|\']*\.(' . $targets . ')[^"|\']*)|(?<=url[\(])(([^\)])*(' . $targets . ')[^\)]*))/i';
         preg_match_all($regexp, $this->html, $result);
 
         // all links should be in second group
         $links = empty($result[1]) ? array() : $result[1];
 
+        $links = array_unique($links);
         foreach ($links as $link) {
+            // remove ' and " from URL
+            $link       = str_replace(array('\'', '"'), '', $link);
             $newLink    = $this->makeLink($link);
             $link       = preg_quote($link, '/');
-            $this->html = preg_replace("/($link)/i", $newLink, $this->html, 1);
+
+            // (?<=url[\(])(\/sdah\/styles\.css)(?=[\)])|(?<=url\([\"|\'])(\/sdah\/styles\.css)(?=[\"|\'])
+
+            $this->html = preg_replace("/((?<=[^style]=[\"|\'])({$link})(?=[\"|\'])|((?<=url[\(])({$link})(?=[\)])|(?<=url\([\"|\'])({$link})(?=[\"|\'])))/i", $newLink, $this->html);
         }
     }
 
